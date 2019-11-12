@@ -1,0 +1,30 @@
+sudo: required
+services:
+  - docker 
+before_install:
+  - docker build -t anshnagrath/react-test -f ./client/Dockerfile.dev ./client
+script:
+  - docker run -e CI=true  anshnagrath/react-test npm test -- -- coverage  
+after_success:
+  - docker build -t anshnagrath/multi-client ./client
+  - docker build -t anshnagrath/multi-nginx ./nginx
+  - docker build -t anshnagrath/multi-worker ./worker
+  - docker build -t anshnagrath/multi-server ./server
+  #Log into dockerhub
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID"  --password-stdin  
+  - docker push anshnagrath/multi-client
+  - docker push anshnagrath/multi-server
+  - docker push anshnagrath/multi-worker
+  - docker push anshnagrath/multi-nginx
+deploy:
+  provider: elasticbeanstalk
+  region: us-west-1
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: "s3bucket"
+  bucket_path: docker-multi
+  on:
+    branch: master
+  access_key_id: $AWSAcressKey
+  secret_access_key: $AWSSecretAcessKey  
+

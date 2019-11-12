@@ -1,0 +1,39 @@
+{
+    "AWSEBDockerrunVersoin":2,
+    "containerDefinations":[
+        {
+            "name":"client",
+            "image":"anshnagrath/multi-client",
+            "hostname":"client",
+            "memory": 128,
+            "essential":true
+        },{
+            "name": "server",
+            "image":"anshnagrath/multi-server",
+            "hostname":"api",
+            "memory": 128,
+            "essential":true
+        },
+        {
+            "name":"worker",
+            "image":"anshnagrath/multi-worker",
+            "hostname":"worker",
+            "memory": 128,
+            "essential":false
+        },{
+            "name":"nginx",
+            "image":"anshnagrath/multi-nginx",
+            "hostname":"nginx",
+            "essential":true,
+            "memory": 128,
+            "portMappings":[
+                {
+                    "hostPort":80,
+                    "containerPort":80
+                }
+            ],
+            "links":["client","server"]
+
+        }
+    ]
+}
